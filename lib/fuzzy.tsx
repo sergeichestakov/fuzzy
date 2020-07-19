@@ -1,30 +1,36 @@
+import * as React from "react";
+
 interface MatchOptions {
   pre?: string;
   post?: string;
+  matchRenderer?: (match: string) => React.ReactNode;
   caseSensitive?: boolean;
 }
 
 interface MatchResult {
+  elements: React.ReactNode[];
   rendered: string;
   score: number;
-}
-
-interface ExtractCallback<T> {
-  (input: T): string;
 }
 
 interface FilterOptions<T> {
   pre?: string;
   post?: string;
-  extract?: ExtractCallback<T>;
+  extract?: (input: T) => string;
+  matchRenderer?: (match: string) => React.ReactNode;
 }
 
 export interface FilterResult<T> {
   string: string;
   score: number;
   index: number;
+  elements: React.ReactNode[];
   original: T;
 }
+
+const defaultRenderer = (input: string) => {
+  return <>{input}</>;
+};
 
 function extractString<T>(element: T, options: FilterOptions<T>): string {
   if (typeof element === "string") {
@@ -44,7 +50,7 @@ function simpleFilter(pattern: string, array: string[]): string[] {
 }
 
 /**
- * Does `pattern` fuzzy match `inputString`?
+ * Dos `pattern` fuzzy match `inputString`?
  */
 function test(pattern: string, inputString: string): boolean {
   return match(pattern, inputString) !== null;
@@ -64,6 +70,7 @@ function match(
   const len = inputString.length;
   const pre = options.pre || "";
   const post = options.post || "";
+  const matchRenderer = options.matchRenderer || defaultRenderer;
 
   // String to compare against. This might be a lowercase version of the
   // raw string
@@ -78,17 +85,39 @@ function match(
   let totalScore = 0;
   let currScore = 0;
 
+  /*
+   * If the input string includes the pattern as a consecutive substring,
+   * we can avoid doing any more calculations and
+   * place the pre and post characters using the index of the match
+   * rather than using the fuzzy finding algorithm since that has a bias towards
+   * matching the first occurance of a character rather than rewarding proximity
+   * towards the rest of the pattern.
+   */
+  if (inputString.includes(inputPattern)) {
+    const matchIndex = inputString.indexOf(inputPattern);
+    const beforeMatch = inputString.slice(0, matchIndex);
+    const afterMatch = inputString.slice(matchIndex + inputPattern.length);
+
+    const elements = [beforeMatch, matchRenderer(inputPattern), afterMatch];
+    const rendered = `${beforeMatch}${pre}${inputPattern}${post}${afterMatch}`;
+    const score = inputPattern.length ** inputPattern.length;
+    return { rendered, score, elements };
+  }
+
+  const elements = [];
   // For each character in the string, either add it to the result
   // or wrap in template if it's the next string in the pattern
   for (let idx = 0; idx < len; idx++) {
     ch = inputString[idx];
     if (compareString[idx] === pattern[patternIdx]) {
+      elements.push(matchRenderer(ch));
       ch = pre + ch + post;
       patternIdx += 1;
 
       // consecutive characters should increase the score more than linearly
       currScore += 1 + currScore;
     } else {
+      elements.push(ch);
       currScore = 0;
     }
     totalScore += currScore;
@@ -99,7 +128,11 @@ function match(
   if (patternIdx === pattern.length) {
     // if the string is an exact match with pattern, totalScore should be maxed
     totalScore = compareString === pattern ? Infinity : totalScore;
-    return { rendered: result.join(""), score: totalScore };
+    return {
+      rendered: result.join(""),
+      score: totalScore,
+      elements,
+    };
   }
 
   return null;
@@ -127,6 +160,7 @@ function filter<T>(
     if (rendered !== null) {
       result.push({
         string: rendered.rendered,
+        elements: rendered.elements,
         score: rendered.score,
         index,
         original: element,
