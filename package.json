@@ -16,8 +16,9 @@
     "url": "https://github.com/sergeichestakov/fuzzy/issues"
   },
   "main": "dist/fuzzy.js",
-  "engines": {
-    "node": ">= 0.6.0"
+  "scripts": {
+    "watch": "tsc --watch",
+    "build": "tsc"
   },
   "keywords": [
     "fuzzy",
