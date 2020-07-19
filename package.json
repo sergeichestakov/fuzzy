@@ -15,7 +15,7 @@
   "bugs": {
     "url": "https://github.com/sergeichestakov/fuzzy/issues"
   },
-  "main": "lib/fuzzy.tsx",
+  "main": "dist/fuzzy.js",
   "engines": {
     "node": ">= 0.6.0"
   },
