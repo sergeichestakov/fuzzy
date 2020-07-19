@@ -1,40 +1,23 @@
 {
   "name": "fuzzy",
   "description": "small, standalone fuzzy search / fuzzy filter. browser or node",
-  "version": "0.1.3",
-  "homepage": "https://github.com/mattyork/fuzzy",
+  "version": "0.1.4",
+  "homepage": "https://github.com/sergeichestakov/fuzzy",
   "author": {
-    "name": "Matt York",
-    "email": "york.matt@gmail.com",
-    "url": "mattyork.org"
+    "name": "Sergei Chestakov",
+    "email": "sergei332@gmail.com",
+    "url": "sergeichestakov.com"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/mattyork/fuzzy.git"
+    "url": "git://github.com/sergeichestakov/fuzzy.git"
   },
   "bugs": {
-    "url": "https://github.com/mattyork/fuzzy/issues"
+    "url": "https://github.com/sergeichestakov/fuzzy/issues"
   },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/mattyork/fuzzy/blob/master/LICENSE-MIT"
-    }
-  ],
-  "main": "lib/fuzzy",
-  "typings": "lib/fuzzy",
+  "main": "lib/fuzzy.tsx",
   "engines": {
     "node": ">= 0.6.0"
-  },
-  "scripts": {
-    "test": "./node_modules/.bin/mocha"
-  },
-  "devDependencies": {
-    "mocha": ">= 1.3.0",
-    "chai": ">= 1.1.1",
-    "underscore": ">= 1.3.3",
-    "uglify-js": ">= 1.3.2",
-    "jshint": ">= 0.7.1"
   },
   "keywords": [
     "fuzzy",
@@ -42,5 +25,11 @@
     "filter",
     "sublime",
     "sublime text"
-  ]
+  ],
+  "dependencies": {
+    "react": "^16.13.1"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.43"
+  }
 }
